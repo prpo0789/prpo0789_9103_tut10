@@ -17,7 +17,7 @@
 
 
 
-![Image Description](Piet_Mondrian Broadway_Boogie_Woogie.jpeg)
+![Image Description]
 
 
 
