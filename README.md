@@ -17,7 +17,7 @@
 
 
 
-![Image Description]
+![Image Description](07mondrain-moma3-superJumbo.jpg)
 
 
 
@@ -25,7 +25,7 @@
 
 For our assignment based on Piet Mondrian's "Broadway Boogie Woogie," I'm inspired by the technique of motion blur, commonly seen in photography and film. This technique captures the dynamic movement and energy present in the artwork. By incorporating motion blur into our project, we can simulate the sense of movement and rhythm inspired by the boogie-woogie music. This adds depth and realism to our visual representation, enhancing the overall experience for the viewer.
 
-
+![Image Description]
 
 **Part 2: Coding Technique Exploration**
 
