@@ -20,6 +20,7 @@ For our assignment based on Piet Mondrian's "Broadway Boogie Woogie," I'm inspir
 **Part 2: Coding Technique Exploration**
 
 ![Image Description](WechatIMG700.jpg)
+![Image Description](WechatIMG720.jpg)
 
 
 
