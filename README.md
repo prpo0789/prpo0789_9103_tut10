@@ -3,17 +3,7 @@
 # Design research 
 
 
-**Bold Text** or __Bold Text__
-*Italic Text* or _Italic Text_
 
-- Item 1
-- Item 2
-  - Subitem 2.1
-  - Subitem 2.2
-
-  1. First Item
-2. Second Item
-3. Third Item
 
 
 
@@ -29,7 +19,7 @@ For our assignment based on Piet Mondrian's "Broadway Boogie Woogie," I'm inspir
 
 **Part 2: Coding Technique Exploration**
 
-![Image Description](Screenshot 2567-05-01 at 18.01.02.png)
+![Image Description](WechatIMG700.jpg)
 
 
 To implement motion blur in our project, we can explore the use of WebGL shaders. Shaders allow for complex visual effects to be applied to images and animations in real-time. By using motion blur shaders, we can achieve a realistic blur effect that simulates the movement of objects in the artwork. Here's an example implementation using WebGL shaders : [Link Text](https://editor.p5js.org/AhmadMoussa/sketches/VrZs1OLQG))
