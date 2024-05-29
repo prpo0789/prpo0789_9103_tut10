@@ -1,168 +1,222 @@
-//We need a variable to hold our image
-let img;
+let numRectangles = 25;
+let rectangleWidth;
+let rectangleHeight;
+let lineRectangles = [];
+let drawRectangles = true;
+let charaBlocks = [];
+let smallCharaBlocks = [];
+let boundary = [];
+let eventInterval = 40;  // 20 frames interval for events
+let timer = 0;  // Timer to track frames for periodic events
 
-//We will divide the image into segments
-let numSegments = 50;
-
-//We will store the segments in an array
-let segments = [];
-
-//let's add a variable to switch between drawing the image and the segments
-let drawSegments = true;
-
-//Let's make an object to hold the draw properties of the image
-let imgDrwPrps = {aspect: 0, width: 0, height: 0, xOffset: 0, yOffset: 0};
-
-//And a variable for the canvas aspect ratio
-let canvasAspectRatio = 0;
-
-//let's load the image from disk
-function preload() {
-  img = loadImage('/assets/Mona_Lisa_by_Leonardo_da_Vinci_500_x_700.jpg');
-}
+let yellow, blue, beige, red;
+let randomColors;
 
 function setup() {
-  //We will make the canvas the same size as the image using its properties
-  createCanvas(windowWidth, windowHeight);
-  //let's calculate the aspect ratio of the image - this will never change so we only need to do it once
-  imgDrwPrps.aspect = img.width / img.height;
-  
-  //now let's calculate the draw properties of the image using the function we made
-  calculateImageDrawProps();
-  //We can use the width and height of the image to calculate the size of each segment
-  //We use these values to calculate the coordinates of the centre of each segment so we can get the colour of the pixel from the image
-  let segmentWidth = img.width / numSegments;
-  let segmentHeight = img.height / numSegments;
-  /*
-  Divide the original image into segments, we are going to use nested loops, this is the same as 
-  but we have changed the class defintion so we use the row and column position of the segment
-  */
- //this will be the column position of every segment, we set it outside the loop 
-let positionInColumn = 0;
-  for (let segYPos=0; segYPos<img.height; segYPos+=segmentHeight) {
-    //this is looping over the height
-    let positionInRow = 0
-    for (let segXPos=0; segXPos<img.width; segXPos+=segmentWidth) {
-      //We will use the x and y position to get the colour of the pixel from the image
-      //let's take it from the centre of the segment
-      let segmentColour = img.get(segXPos + segmentWidth / 2, segYPos + segmentHeight / 2);
-       let segment = new ImageSegment(positionInColumn, positionInRow,segmentColour);
-       segments.push(segment);
-       positionInRow++;
+  createCanvas(500, 500);
+  rectangleWidth = width / numRectangles;
+  rectangleHeight = height / numRectangles;
+
+  yellow = color(236, 214, 38);
+  blue = color(68, 105, 186);
+  beige = color(217, 216, 211);
+  red = color(176, 58, 46);
+  randomColors = [yellow, blue, beige, red];
+
+  let verticalStartX = [140, 220, 260, 380];
+  let horizontalStartY = [60, 260, 400];
+
+  for (let i = 0; i < horizontalStartY.length; i++) {
+    let startY = horizontalStartY[i];
+    for (let j = 0; j < numRectangles; j++) {
+      let x = j * rectangleWidth;
+      let y = startY;
+      lineRectangles.push(new Rectangle(x, y, rectangleWidth, rectangleHeight, random(randomColors)));
     }
-    positionInColumn++;
   }
-  for (const segment of segments) {
-    segment.calculateSegDrawProps();
+
+  for (let i = 0; i < verticalStartX.length; i++) {
+    let startX = verticalStartX[i];
+    for (let j = 0; j < numRectangles; j++) {
+      let x = startX;
+      let y = j * rectangleHeight;
+      lineRectangles.push(new Rectangle(x, y, rectangleWidth, rectangleHeight, random(randomColors)));
+    }
+  }
+
+  let charaWidth = random(40, 60);
+  let charaHeight = random(40, 60);
+
+  // Define boundaries here as needed...
+  // Dummy boundaries for demonstration purposes
+  boundary.push({ startX: 50, startY: 100, endX: 450, endY: 400 });
+
+  for (let i = 0; i < 6; i++) {
+    let randomBoundary = boundary[floor(random() * boundary.length)];
+    charaBlocks.push(new Chara(
+      random(randomBoundary.startX, randomBoundary.endX),
+      random(randomBoundary.startY, randomBoundary.endY),
+      charaWidth, charaHeight, random() >= 0.5, random(randomColors)));
+  }
+
+  for (let i = 0; i < 10; i++) {
+    let randomBoundary = boundary[floor(random() * boundary.length)];
+    smallCharaBlocks.push(new SmallChara(
+      random(randomBoundary.startX, randomBoundary.endX),
+      random(randomBoundary.startY, randomBoundary.endY),
+      random(20, 30), random(20, 30), random(randomColors)));
   }
 }
 
 function draw() {
-  background(0);
-  if (drawSegments) {
-    //let's draw the segments to the canvas
-    for (const segment of segments) {
-      segment.draw();
-    }
-  } else {
-    //let's draw the image to the canvas
-    image(img, imgDrwPrps.xOffset, imgDrwPrps.yOffset, imgDrwPrps.width, imgDrwPrps.height);
+  background(255);  // Set background to white
+  if (drawRectangles) {
+    lineRectangles.forEach(rect => rect.draw());
   }
-}
-function keyPressed() {
-  if (key == " ") {
-    //this is a neat trick to invert a boolean variable,
-    //it will always make it the opposite of what it was
-    drawSegments = !drawSegments;
-  }
-}
+  charaBlocks.forEach(chara => {
+    chara.move();
+    chara.checkCollision();
+    chara.draw();
+  });
+  smallCharaBlocks.forEach(smallChara => {
+    smallChara.move();
+    smallChara.draw();
+  });
+  stroke(0);
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  calculateImageDrawProps();
-  for (const segment of segments) {
-    segment.calculateSegDrawProps();
+  timer++;
+  if (timer >= eventInterval) {
+    triggerEvent();
+    timer = 0; // Reset timer
   }
 }
 
-function calculateImageDrawProps() {
-  //Calculate the aspect ratio of the canvas
-  canvasAspectRatio = width / height;
-  //if the image is wider than the canvas
-  if (imgDrwPrps.aspect > canvasAspectRatio) {
-    //then we will draw the image to the width of the canvas
-    imgDrwPrps.width = width;
-    //and calculate the height based on the aspect ratio
-    imgDrwPrps.height = width / imgDrwPrps.aspect;
-    imgDrwPrps.yOffset = (height - imgDrwPrps.height) / 2;
-    imgDrwPrps.xOffset = 0;
-  } else if (imgDrwPrps.aspect < canvasAspectRatio) {
-    //otherwise we will draw the image to the height of the canvas
-    imgDrwPrps.height = height;
-    //and calculate the width based on the aspect ratio
-    imgDrwPrps.width = height * imgDrwPrps.aspect;
-    imgDrwPrps.xOffset = (width - imgDrwPrps.width) / 2;
-    imgDrwPrps.yOffset = 0;
-  }
-  else if (imgDrwPrps.aspect == canvasAspectRatio) {
-    //if the aspect ratios are the same then we can draw the image to the canvas size
-    imgDrwPrps.width = width;
-    imgDrwPrps.height = height;
-    imgDrwPrps.xOffset = 0;
-    imgDrwPrps.yOffset = 0;
-  }
+function triggerEvent() {
+  lineRectangles.forEach(rect => {
+    rect.color = random(randomColors);
+  });
+  charaBlocks.forEach(chara => {
+    chara.color = random(randomColors);
+    chara.toggleState();
+  });
+  smallCharaBlocks.forEach(smallChara => {
+    smallChara.color = random(randomColors);
+  });
 }
-//Here is our class for the image segments, we start with the class keyword
-class ImageSegment {
 
-  constructor(columnPositionInPrm, rowPostionInPrm  ,srcImgSegColourInPrm) {
-    //Now we have changed the class a lot, instead of the x and y position of the segment, we will store the row and column position
-    //The row and column position give us relative position of the segment in the image that do not change when the image is resized
-    //We will use these to calculate the x and y position of the segment when we draw it
-
-    this.columnPosition = columnPositionInPrm;
-    this.rowPostion = rowPostionInPrm;
-    this.srcImgSegColour = srcImgSegColourInPrm;
-    //These parameters are not set when we create the segment object, we will calculate them later
-    this.drawXPos = 0;
-    this.drawYPos = 0;
-    this.drawWidth = 0;
-    this.drawHeight = 0;
-  
-    
-  }
-
-  calculateSegDrawProps() {
-    //Here is where we will calculate the draw properties of the segment.
-    //The width and height are easy to calculate, remember the image made of segments is always the same size as the whole image even when it is resized
-    //We can use the width and height we calculated for the image to be drawn, to calculate the size of each segment
-    this.drawWidth = imgDrwPrps.width / numSegments;
-    this.drawHeight = imgDrwPrps.height / numSegments;
-    
-    //we can use the row and column position to calculate the x and y position of the segment
-    //Here is a diagram to help you visualise what is going on
-    
-    //          column0 column1 column2 column3 column4
-    //             ↓       ↓       ↓       ↓       ↓
-    //    row0 → 0,0     0,1     0,2     0,3     0,4
-    //    row1 → 1,0     1,1     1,2     1,3     1.4
-    //    row2 → 2,0     2,1     2,2     2,3     2,4
-    //    row3 → 3,0     3,1     3,2     3,3     3,4
-    //    row4 → 4,0     4,1     4,2     4,3     4,4
-
-    //The x position is the row position multiplied by the width of the segment plus the x offset we calculated for the image
-    this.drawXPos = this.rowPostion * this.drawWidth + imgDrwPrps.xOffset;
-    //The y position is the column position multiplied by the height of the segment plus the y offset we calculated for the image
-    this.drawYPos = this.columnPosition * this.drawHeight + imgDrwPrps.yOffset;
+class Rectangle {
+  constructor(x, y, width, height, color) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.color = color;
   }
 
   draw() {
-    //let's draw the segment to the canvas, first we set the stroke and fill colours
-    stroke(0);
-    fill(this.srcImgSegColour);
-    //Then draw the segment as a rectangle, using the draw properties we calculated
-    rect(this.drawXPos, this.drawYPos, this.drawWidth, this.drawHeight);
+    noStroke();
+    fill(this.color);
+    rect(this.x, this.y, this.width, this.height);
+  }
+}
+
+class Chara {
+  constructor(x, y, baseWidth, baseHeight, state, color) {
+    this.x = x;
+    this.y = y;
+    this.baseWidth = baseWidth;
+    this.baseHeight = baseHeight;
+    this.breathingSpeed = 0.30;
+    this.speed = random(2, 5);
+    this.direction = 1;
+    this.Horizontal = state;
+    this.color = color;
   }
 
+  update() {
+    let breathSizeOuter = sin(frameCount * this.breathingSpeed) * 5;
+    let currentWidth = this.baseWidth + breathSizeOuter;
+    let currentHeight = this.baseHeight + breathSizeOuter;
+    let breathSizeInner = sin(frameCount * this.breathingSpeed + PI / 2) * 2;
+    let innerWidth = this.baseWidth * 0.5 + breathSizeInner;
+    let innerHeight = this.baseHeight * 0.5 + breathSizeInner;
+    let breathSizeSmallest = sin(frameCount * this.breathingSpeed + PI) * 0.5;
+    let smallestWidth = this.baseWidth * 0.25 + breathSizeSmallest;
+    let smallestHeight = this.baseHeight * 0.25 + breathSizeSmallest;
 
+    push();
+    stroke('#FFFFFF');  
+    fill(this.color);
+    rectMode(CENTER);
+    rect(this.x, this.y, currentWidth, currentHeight);
+    fill('#FFD700');
+    rect(this.x, this.y, innerWidth, innerHeight);
+    fill('#FFFFFF');
+    rect(this.x, this.y, smallestWidth, smallestHeight);
+    pop();
+  }
+
+  draw() {
+    this.update();
+  }
+
+  move() {
+    if (this.Horizontal) {
+      this.x += this.speed * this.direction;
+    } else {
+      this.y += this.speed * this.direction;
+    }
+  }
+
+  checkCollision() {
+    if (this.Horizontal) {
+      if (this.x <= 50 || this.x >= 450) {
+        this.direction *= -1;
+      }
+    } else {
+      if (this.y <= 100 || this.y >= 400) {
+        this.direction *= -1;
+      }
+    }
+  }
+
+  toggleState() {
+    this.Horizontal = !this.Horizontal; // Toggle movement direction
+  }
+}
+
+class SmallChara {
+  constructor(x, y, baseWidth, baseHeight, color) {
+    this.x = x;
+    this.y = y;
+    this.baseWidth = baseWidth;
+    this.baseHeight = baseHeight;
+    this.breathingSpeed = 0.20;
+    this.color = color;
+    this.speedX = random(1, 3) * (random() > 0.5 ? 1 : -1);
+    this.speedY = random(1, 3) * (random() > 0.5 ? 1 : -1);
+  }
+
+  draw() {
+    let breathSize = sin(frameCount * this.breathingSpeed) * 5;
+    let currentWidth = this.baseWidth + breathSize;
+    let currentHeight = this.baseHeight + breathSize;
+
+    noStroke();
+    fill(this.color);
+    rect(this.x, this.y, currentWidth, currentHeight);
+  }
+
+  move() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+
+    // Check boundaries
+    if (this.x <= 0 || this.x >= width - this.baseWidth) {
+      this.speedX *= -1;
+    }
+    if (this.y <= 0 || this.y >= height - this.baseHeight) {
+      this.speedY *= -1;
+    }
+  }
 }
