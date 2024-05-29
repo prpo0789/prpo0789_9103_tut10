@@ -6,7 +6,7 @@ let drawRectangles = true;
 let charaBlocks = [];
 let smallCharaBlocks = [];
 let boundary = [];
-let eventInterval = 40;  // 20 frames interval for events
+let eventInterval = 40;  // 40 frames interval for events
 let timer = 0;  // Timer to track frames for periodic events
 
 let yellow, blue, beige, red;
