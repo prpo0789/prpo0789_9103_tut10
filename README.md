@@ -14,8 +14,6 @@ timer: This variable keeps track of the number of frames that have passed.
 
 
 
-![Image Description](07mondrain-moma3-superJumbo.jpg)
-
 
 # Explanation
 
@@ -27,6 +25,7 @@ Event Trigger:
 - triggerEvent();: If the condition is met, the triggerEvent function is called to perform specific actions (like changing colors and toggling states).
 - timer = 0;: The timer is reset to 0 after triggering the event, allowing the process to start over for the next 40 frames.
 
+![Image Description](WechatIMG1060.jpg)
 
 # Trigger Event Function
 
@@ -36,6 +35,13 @@ Explanation
 
 Toggle State:
 - The state (movement direction) of the large character blocks is toggled.
+
+![Image Description](WechatIMG1059.jpg)
+
+
+
+
+
 
 
 
