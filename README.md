@@ -63,8 +63,8 @@ Dynamic Size Changes:
 
 - The size of the character blocks changes over time using the sin function, creating a continuous breathing effect. By using different phases of the sin function (e.g., adding PI / 2 or PI), we can create layered breathing effects. This makes the overall movement more complex and lifelike.
 
-![Image Description](07mondrain-moma3-superJumbo.jpg)
-![Image Description](07mondrain-moma3-superJumbo.jpg)
+![Image Description](WechatIMG3079.jpg)
+![Image Description](WechatIMG3080.jpg)
 
 
 
